@@ -1,19 +1,85 @@
+//////////////////////////////////////////////////////////////////////////////
 //
-// Created by 92420 on 2022/7/30.
+//  Triangles.cpp
 //
+//////////////////////////////////////////////////////////////////////////////
+
 #include <iostream>
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+#include "LoadShaders.h"
+enum VAO_IDs { Triangles, NumVAOs };
+enum Buffer_IDs { ArrayBuffer, NumBuffers };
+enum Attrib_IDs { vPosition = 0 };
 
-int main()
+GLuint  VAOs[NumVAOs];
+GLuint  Buffers[NumBuffers];
+
+const GLuint  NumVertices = 6;
+
+//----------------------------------------------------------------------------
+//
+// init
+//
+
+
+
+void
+init( void )
 {
-#pragma region OpenGL Initialization
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glGenVertexArrays( NumVAOs, VAOs );
+    glBindVertexArray( VAOs[Triangles] );
 
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    GLfloat  vertices[NumVertices][2] = {
+            { -0.90f, -0.90f }, {  0.85f, -0.90f }, { -0.90f,  0.85f },  // Triangle 1
+            {  0.90f, -0.85f }, {  0.90f,  0.90f }, { -0.85f,  0.90f }   // Triangle 2
+    };
+
+    glCreateBuffers( NumBuffers, Buffers );
+    glBindBuffer( GL_ARRAY_BUFFER, Buffers[ArrayBuffer] );
+    glNamedBufferStorage( GL_ARRAY_BUFFER, sizeof(vertices), vertices, 0);
+
+
+    ShaderInfo  shaders[] =
+            {
+                    { GL_VERTEX_SHADER, "./shaders/triangles.vert" },
+                    { GL_FRAGMENT_SHADER, "./shaders/triangles.frag" },
+                    { GL_NONE, NULL }
+            };
+
+    GLuint program = LoadShaders( shaders );
+    glUseProgram( program );
+
+    glVertexAttribPointer( vPosition, 2, GL_FLOAT,
+                           GL_FALSE, 0, 0 );
+    glEnableVertexAttribArray( vPosition );
+}
+
+//----------------------------------------------------------------------------
+//
+// display
+//
+
+void
+display( void )
+{
+    static const float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+    glClearBufferfv(GL_COLOR, 0, black);
+
+    glBindVertexArray( VAOs[Triangles] );
+    glDrawArrays( GL_TRIANGLES, 0, NumVertices );
+}
+
+//----------------------------------------------------------------------------
+//
+// main
+//
+int main(int argc, char **argv) {
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     GLFWwindow* window = glfwCreateWindow(1000, 1000, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
@@ -28,6 +94,15 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return 0;
     }
+    init();
+
+    while (!glfwWindowShouldClose(window)) {
+        display();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
 
     glfwTerminate();
 }
