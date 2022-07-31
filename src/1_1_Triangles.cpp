@@ -8,8 +8,8 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include "LoadShaders.h"
-enum VAO_IDs { Triangles, NumVAOs };
-enum Buffer_IDs { ArrayBuffer, NumBuffers };
+enum VAO_IDs { Triangles = 0, NumVAOs };
+enum Buffer_IDs { ArrayBuffer = 0, NumBuffers };
 enum Attrib_IDs { vPosition = 0 };
 
 GLuint  VAOs[NumVAOs];
@@ -37,13 +37,13 @@ init( void )
 
     glCreateBuffers( NumBuffers, Buffers );
     glBindBuffer( GL_ARRAY_BUFFER, Buffers[ArrayBuffer] );
-    glNamedBufferStorage( GL_ARRAY_BUFFER, sizeof(vertices), vertices, 0);
+    glBufferStorage( GL_ARRAY_BUFFER, sizeof(vertices), vertices, 0);
 
 
     ShaderInfo  shaders[] =
             {
-                    { GL_VERTEX_SHADER, "./shaders/triangles.vert" },
-                    { GL_FRAGMENT_SHADER, "./shaders/triangles.frag" },
+                    { GL_VERTEX_SHADER, "../shaders/triangles.vert" },
+                    { GL_FRAGMENT_SHADER, "../shaders/triangles.frag" },
                     { GL_NONE, NULL }
             };
 
@@ -51,7 +51,7 @@ init( void )
     glUseProgram( program );
 
     glVertexAttribPointer( vPosition, 2, GL_FLOAT,
-                           GL_FALSE, 0, 0 );
+                           GL_FALSE, 0, (void*)0 );
     glEnableVertexAttribArray( vPosition );
 }
 
@@ -77,10 +77,10 @@ display( void )
 //
 int main(int argc, char **argv) {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow* window = glfwCreateWindow(1000, 1000, "LearnOpenGL", NULL, NULL);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
